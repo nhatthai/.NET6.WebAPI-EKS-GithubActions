@@ -57,32 +57,19 @@ jobs:
         echo "Pushing image to ECR..."
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
 
-  # deploy_eks:
-  #   needs: build
-  #   runs-on: self-hosted
-  #   steps:
+  deploy_eks:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
 
-  #   - name: Configure AWS credentials
-  #     uses: aws-actions/configure-aws-credentials@v1
-  #     with:
-  #       aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #       aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #       aws-region: ${{ env.AWS_REGION }}
+    # Create namespace if doesn't exist
+    - run: |
+        kubectl create namespace ${{ env.NAMESPACE }} --dry-run=client -o json | kubectl apply -f -
 
-  #   # Create namespace if doesn't exist
-  #   - run: |
-  #       kubectl create namespace ${{ env.NAMESPACE }} --dry-run=client -o json | kubectl apply -f -
-
-  #   # Deploy app to EKS
-  #   - uses: azure/k8s-deploy@v1
-  #     with:
-  #       manifests: |
-  #         ${{ github.workspace }}/k8s/webapi.yml
-  #         ${{ github.workspace }}/k8s/ingress-aks.yml
-  #       images: |
-  #         ${{ env.ECR_REGISTRY_NAME }}/${{ env.ECR_REPOSITORY }}:${{ github.sha }}
-  #       imagepullsecrets: |
-  #         ${{ env.SECRET }}
-  #       namespace: ${{ env.NAMESPACE }}
-  #     env:
-  #       IMAGE_TAG: ${{ github.sha }}
+    # Deploy app to EKS
+    - run: |
+        kubectl apply -f ${{ github.workspace }}/k8s/webapi.yml
+      env:
+        IMAGE_TAG: ${{ github.sha }}
+        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}

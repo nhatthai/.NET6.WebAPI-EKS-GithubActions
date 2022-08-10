@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
       - name: webapi
-        image: learndeploymentgithub.azurecr.io/net6web:${IMAGE_TAG}
+        image: 783560535431.dkr.ecr.ap-southeast-1.amazonaws.com/learn-github-actions:${IMAGE_TAG}
         imagePullPolicy: Always
         env:
         - name: PATH_BASE
