@@ -8,7 +8,7 @@ on:
 
 env:
   AWS_REGION: 'ap-southeast-1'
-  ECR_REGISTRY_NAME: 'https://783560535431.dkr.ecr.ap-southeast-1.amazonaws.com'
+  ECR_REGISTRY_NAME: '783560535431.dkr.ecr.ap-southeast-1.amazonaws.com'
   ECR_REPOSITORY: 'learn-github-actions'
   NAMESPACE: learn-github
   SECRET: 'learnsecret'
