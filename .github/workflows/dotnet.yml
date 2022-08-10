@@ -72,9 +72,9 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
-    # Create namespace if doesn't exist
+    # Create kubeconfig
     - run: |
-        kubectl create namespace ${{ env.NAMESPACE }} --dry-run=client -o json | kubectl apply -f -
+        aws eks update-kubeconfig --region ap-southeast-1 --name eks-learn-github
 
     # Deploy app to EKS
     - run: |
