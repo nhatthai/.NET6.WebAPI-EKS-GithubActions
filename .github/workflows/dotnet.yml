@@ -60,7 +60,8 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-
+    - uses: actions/checkout@v3
+    
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
@@ -81,6 +82,4 @@ jobs:
         kubectl apply -f ${{ github.workspace }}/k8s/webapi.yml
       env:
         IMAGE_TAG: ${{ github.sha }}
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        ECR_REPOSITORY: ${{ env.ECR_REPOSITORY }}
-
+        
