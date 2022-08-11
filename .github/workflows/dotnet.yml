@@ -61,7 +61,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3
-    
+
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
       with:
@@ -80,6 +80,6 @@ jobs:
     # Deploy app to EKS
     - run: |
         kubectl apply -f ${{ github.workspace }}/k8s/webapi.yml
+        kubectl apply -f ${{ github.workspace }}/k8s/ingress-eks.yml
       env:
         IMAGE_TAG: ${{ github.sha }}
-        

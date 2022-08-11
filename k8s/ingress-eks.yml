@@ -20,4 +20,3 @@ spec:
             name: webapi
             port:
               number: 80
-      
