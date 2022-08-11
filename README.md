@@ -9,4 +9,10 @@ Deploy a sample .Net6 WebAPI to Amazon EKS with Github Actions
 
 ### Usage
 
+### Install the AWS Load Balancer Controller using Helm 3.0.0
+####Install the TargetGroupBinding custom resource definitions:
+    ```
+    kubectl apply -k "github.com/aws/eks-charts/stable/aws-load-balancer-controller//crds?ref=master"
+    ```
+
 ### Reference
