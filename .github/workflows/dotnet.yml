@@ -75,10 +75,6 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
-    # Pull image
-    - run: |
-        docker pull 783560535431.dkr.ecr.ap-southeast-1.amazonaws.com/learn-github-actions:2f9ed840ea7863f867536bebf25b1e41745cf912
-
     # Create kubeconfig
     - run: |
         aws eks update-kubeconfig --region ap-southeast-1 --name eks-learn-github
