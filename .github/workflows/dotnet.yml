@@ -81,7 +81,5 @@ jobs:
 
     # Deploy app to EKS
     - run: |
+        export IMAGE_TAG=${{ github.sha }}
         kubectl apply -f ${{ github.workspace }}/k8s/webapi.yml
-        kubectl apply -f ${{ github.workspace }}/k8s/ingress-eks.yml
-      env:
-        IMAGE_TAG: ${{ github.sha }}
