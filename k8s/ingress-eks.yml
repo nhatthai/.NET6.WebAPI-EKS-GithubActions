@@ -9,11 +9,12 @@ metadata:
     kubernetes.io/ingress.class: alb
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
+    alb.ingress.kubernetes.io/subnets: subnet-f80bae8e, subnet-ef4ae18b, subnet-a24866e4
 spec:
   rules:
   - http:
       paths:
-      - path: /webapi(/|$)(.*)
+      - path: /webapi
         pathType: Prefix
         backend:
           service:
