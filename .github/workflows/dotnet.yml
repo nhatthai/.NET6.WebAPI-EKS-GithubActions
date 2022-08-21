@@ -80,6 +80,6 @@ jobs:
 
     # Deploy app to EKS
     - run: |
-        export $IMAGE_TAG=${{ github.sha }}
+        export IMAGE_TAG=${{ github.sha }}
         echo $IMAGE_TAG
         kubectl apply -f ${{ github.workspace }}/k8s/webapi.yml
