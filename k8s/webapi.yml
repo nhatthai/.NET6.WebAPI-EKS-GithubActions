@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
       - name: webapi
-        image: 783560535431.dkr.ecr.ap-southeast-1.amazonaws.com/learn-github-actions:17209f86cd4a034c075d63b77d2b6bcbc417d4cf
+        image: 783560535431.dkr.ecr.ap-southeast-1.amazonaws.com/learn-github-actions:$IMAGE_TAG
         imagePullPolicy: Always
         env:
         - name: PATH_BASE

@@ -10,7 +10,6 @@ env:
   AWS_REGION: 'ap-southeast-1'
   ECR_REGISTRY_NAME: '783560535431.dkr.ecr.ap-southeast-1.amazonaws.com'
   ECR_REPOSITORY: 'learn-github-actions'
-  NAMESPACE: learn-github
   EKS_CLUSTER: 'eks-github'
 
 jobs:
@@ -82,4 +81,5 @@ jobs:
     # Deploy app to EKS
     - run: |
         export IMAGE_TAG=${{ github.sha }}
+        echo $IMAGE_TAG
         kubectl apply -f ${{ github.workspace }}/k8s/webapi.yml
