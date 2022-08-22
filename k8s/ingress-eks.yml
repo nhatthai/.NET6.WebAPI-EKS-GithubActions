@@ -6,19 +6,16 @@ metadata:
     component: frontend
   name: ingress-webapi
   annotations:
-    # Public subnets are used for internet-facing load balancers.
-    kubernetes.io/role/elb: 1
-    # kubernetes.io/cluster/eks-github: shared
     kubernetes.io/ingress.class: alb
     alb.ingress.kubernetes.io/scheme: internet-facing
-    alb.ingress.kubernetes.io/target-type: instance
+    alb.ingress.kubernetes.io/target-type: ip
     alb.ingress.kubernetes.io/subnets: subnet-f80bae8e, subnet-ef4ae18b, subnet-a24866e4
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
 spec:
   rules:
   - http:
       paths:
-      - path: /webapi/*
+      - path: /webapi
         pathType: Prefix
         backend:
           service:

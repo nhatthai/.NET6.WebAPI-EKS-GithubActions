@@ -16,7 +16,7 @@ aws eks update-kubeconfig --region ap-southeast-1 --name eks-github
 
 + Create Role
 ```
-aws iam create-role --role-name eksClusterRole --assume-role-policy-document file://"cluster-trust-policy.json"
+aws iam create-role --role-name eksClusterRole --assume-role-policy-document file://AWS/cluster-trust-policy.json
 
 aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/AmazonEKSClusterPolicy --role-name eksClusterRole
 ```
@@ -28,12 +28,12 @@ eksctl utils associate-iam-oidc-provider --region=ap-southeast-1 --cluster=eks-g
 
 + Create policy
 ```
-aws iam create-policy --policy-name ALBIngressControllerIAMPolicy --policy-document file://iam_policy.json
+aws iam create-policy --policy-name ALBIngressControllerIAMPolicy --policy-document file://AWS/iam_policy.json
 ```
 
 + Create Role name for aws load Balancer
 ```
-aws iam create-role --role-name AmazonEKSLoadBalancerControllerRole --assume-role-policy-document file://"load-balancer-role-trust-policy.json"
+aws iam create-role --role-name AmazonEKSLoadBalancerControllerRole --assume-role-policy-document file://AWS/load-balancer-role-trust-policy.json
 ```
 
 + Attach the required Amazon EKS managed IAM policy to the IAM role
@@ -43,7 +43,7 @@ aws iam attach-role-policy --policy-arn arn:aws:iam::ACCOUNT_ID:policy/ALBIngres
 
 + Create an additional policy
 ```
-aws iam create-policy --policy-name AWSLoadBalancerControllerAdditionalIAMPolicy --policy-document file://iam_policy_v1_to_v2_additional.json
+aws iam create-policy --policy-name AWSLoadBalancerControllerAdditionalIAMPolicy --policy-document file://AWS/iam_policy_v1_to_v2_additional.json
 ```
 
 + Attach Role Policy
@@ -55,11 +55,10 @@ aws iam attach-role-policy --role-name AmazonEKSLoadBalancerControllerRole  --po
 ```
 eksctl create iamserviceaccount --cluster=eks-github --namespace=kube-system --name=aws-load-balancer-controller --role-name AmazonEKSLoadBalancerControllerRole --attach-policy-arn=arn:aws:iam::ACCOUNT_ID:policy/ALBIngressControllerIAMPolicy --override-existing-serviceaccounts --approve
 
-
-kubectl apply -f aws-load-balancer-controller-service-account.yml
+kubectl apply -f AWS/aws-load-balancer-controller-service-account.yml
 ```
 
-# Get IAM Service Account
++ Get IAM Service Account
 ```
 eksctl  get iamserviceaccount --cluster eks-github
 
@@ -73,6 +72,11 @@ helm install aws-load-balancer-controller eks/aws-load-balancer-controller --set
 + Verify that the AWS Load Balancer Controller is installed:
 ```
 kubectl get deployment -n kube-system aws-load-balancer-controller
+```
+
++ Get log AWS Load Balancer Controller
+```
+kubectl logs -n kube-system deployment.apps/aws-load-balancer-controller
 ```
 
 ### Reference
