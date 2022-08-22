@@ -82,6 +82,5 @@ jobs:
     - run: |
         export IMAGE_TAG=${{ github.sha }}
         echo $IMAGE_TAG
-        cat k8s/webapi.yml | sed "s/{{IMAGE_TAG}}/$IMAGE_TAG/g"
-        echo k8s/webapi.yml
-        kubectl apply -f ${{ github.workspace }}/k8s/webapi.yml
+        cat k8s/webapi.yml | sed "s/{{IMAGE_TAG}}/$IMAGE_TAG/g" | kubectl apply -f -
+        kubectl apply -f k8s/webapi.yml

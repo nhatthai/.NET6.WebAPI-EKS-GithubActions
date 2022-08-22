@@ -37,8 +37,6 @@ spec:
         image: 783560535431.dkr.ecr.ap-southeast-1.amazonaws.com/learn-github-actions:{{IMAGE_TAG}}
         imagePullPolicy: Always
         env:
-        - name: PATH_BASE
-          value: /webapi
         - name: ASPNETCORE_ENVIRONMENT
           value: Development
         - name: ASPNETCORE_URLS
