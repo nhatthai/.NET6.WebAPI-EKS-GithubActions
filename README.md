@@ -79,6 +79,22 @@ kubectl get deployment -n kube-system aws-load-balancer-controller
 kubectl logs -n kube-system deployment.apps/aws-load-balancer-controller
 ```
 
+### Issues
++ Couldn't create an AWS Load Balancer Controller
+```
+Add permission iam_policy_v1_to_v2_additional.json
+```
+
+
++ Couldn't mapping to webapi service
+```
+Because set Path_Base in code with .NET6(Not set Path_Base variable)
+```
+
+
+### Result
++ ![Web API](./images/mapping-webapi.png)
+
 ### Reference
 + [An ALB Ingress in Amazon EKS](https://aws.amazon.com/premiumsupport/knowledge-center/eks-alb-ingress-aws-waf/)
 + [AWS Load Balancer Controller](https://docs.aws.amazon.com/eks/latest/userguide/aws-load-balancer-controller.html)

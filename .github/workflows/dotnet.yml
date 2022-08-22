@@ -78,9 +78,12 @@ jobs:
     - run: |
         aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name ${{ env.EKS_CLUSTER }}
 
-    # Deploy app to EKS
+    # Set image tag into webapi.yml
     - run: |
         export IMAGE_TAG=${{ github.sha }}
         echo $IMAGE_TAG
         cat k8s/webapi.yml | sed "s/{{IMAGE_TAG}}/$IMAGE_TAG/g" | kubectl apply -f -
+
+    # Deploy web api to EKS
+    - run: |
         kubectl apply -f k8s/webapi.yml
