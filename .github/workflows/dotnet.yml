@@ -74,11 +74,11 @@ jobs:
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v1
 
-    # Create kubeconfig
+    # Create kubeconfig or add kubeconfig into secrets
     - run: |
         aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name ${{ env.EKS_CLUSTER }}
 
-    # Set image tag into webapi.yml
+    # Set image tag into webapi.yml and deploy
     - run: |
         export IMAGE_TAG=${{ github.sha }}
         echo $IMAGE_TAG
