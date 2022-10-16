@@ -10,7 +10,7 @@ env:
   AWS_REGION: 'ap-southeast-1'
   ECR_REGISTRY_NAME: '783560535431.dkr.ecr.ap-southeast-1.amazonaws.com'
   ECR_REPOSITORY: 'learn-github-actions'
-  EKS_CLUSTER: 'eks-github'
+  EKS_CLUSTER: 'webapi-eks-mhDjspX1'
 
 jobs:
   build:
@@ -83,4 +83,3 @@ jobs:
         kubectl create deployment webapi --image=$ECR_REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA --dry-run -o yaml > deployment.yaml
         kubectl apply -f deployment.yaml
         kubectl apply -f webapi.yaml
-        
