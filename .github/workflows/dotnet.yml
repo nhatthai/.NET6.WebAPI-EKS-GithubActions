@@ -80,6 +80,7 @@ jobs:
 
     # Set image tag into webapi.yml and deploy
     - run: |
-        export IMAGE_TAG=${{ github.sha }}
-        echo $IMAGE_TAG
-        cat k8s/webapi.yml | sed "s/{{IMAGE_TAG}}/$IMAGE_TAG/g" | kubectl apply -f -
+        kubectl create deployment webapi --image=$ECR_REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA --dry-run -o yaml > deployment.yaml
+        kubectl apply -f deployment.yaml
+        kubectl apply -f webapi.yaml
+        
