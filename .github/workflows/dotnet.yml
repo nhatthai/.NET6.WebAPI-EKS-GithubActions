@@ -80,6 +80,6 @@ jobs:
 
     # Set image tag into webapi.yml and deploy
     - run: |
-        kubectl create deployment webapi --image=$ECR_REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA --dry-run -o yaml > deployment.yaml
-        kubectl apply -f deployment.yaml
-        kubectl apply -f webapi.yaml
+        kubectl create deployment webapi --image=$ECR_REGISTRY/$ECR_REPOSITORY:$GITHUB_SHA --dry-run -o yaml > deployment.yml
+        kubectl apply -f deployment.yml
+        kubectl apply -f webapi.yml
