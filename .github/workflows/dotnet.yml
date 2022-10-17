@@ -10,7 +10,7 @@ env:
   AWS_REGION: 'ap-southeast-1'
   ECR_REGISTRY_NAME: '783560535431.dkr.ecr.ap-southeast-1.amazonaws.com'
   ECR_REPOSITORY: 'learn-github-actions'
-  EKS_CLUSTER: 'microservice-eks-00mIoI2W'
+  EKS_CLUSTER: 'webapi-eks'
 
 jobs:
   build:
@@ -78,7 +78,7 @@ jobs:
     - run: |
         aws eks update-kubeconfig --region ${{ env.AWS_REGION }} --name ${{ env.EKS_CLUSTER }}
 
-    # Set image tag into webapi.yml and
+    # Set image tag into webapi.tpl.yml and deploy
     - run: |
         export IMAGE_TAG=${{ github.sha }}
         envsubst < devops/k8s/webapi.tpl.yml > webapi.yml

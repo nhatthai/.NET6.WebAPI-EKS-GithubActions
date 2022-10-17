@@ -79,6 +79,43 @@ kubectl get deployment -n kube-system aws-load-balancer-controller
 kubectl logs -n kube-system deployment.apps/aws-load-balancer-controller
 ```
 
+
+### Apply Terraform
++ Create Infrastructure EKS
+    ```
+    cd devops\terraform
+    terraform init
+    terraform apply
+    ```
+
++ Update kubeconfig
+    ```
+    aws eks update-kubeconfig --region ap-southeast-1 --name microservice-eks-00mIoI2W
+    ```
+
++ Create Service Account
+    ```
+    eksctl create iamserviceaccount --cluster=microservice-eks-00mIoI2W --name=aws-load-balancer-controller --namespace=kube-system --role-name eksctl-eks-github-addon-iamserviceaccount-ku-Role1 --attach-policy-arn=arn:aws:iam::783560535431:policy/ALBIngressControllerIAMPolicy --override-existing-serviceaccounts --approve
+
+    kubectl apply -f aws/aws-load-balancer-controller-service-account.yml
+    ```
+
++ Get IAM Service Account
+    ```
+    eksctl get iamserviceaccount --cluster microservice-eks-00mIoI2W
+
+    kubectl describe sa aws-load-balancer-controller -n kube-system
+
+    kubectl apply -k "github.com/aws/eks-charts/stable/aws-load-balancer-controller/crds?ref=master"
+
+    helm install aws-load-balancer-controller eks/aws-load-balancer-controller --set clusterName=microservice-eks-00mIoI2W --set serviceAccount.create=false --set serviceAccount.name=aws-load-balancer-controller -n kube-system
+    ```
+
++ Verify the AWS Load Balancer Controller
+    ```
+    kubectl get deployment -n kube-system aws-load-balancer-controller
+    ```
+
 ### Issues
 + Couldn't create an AWS Load Balancer Controller
 ```
