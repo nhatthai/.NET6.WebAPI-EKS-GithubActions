@@ -4,9 +4,9 @@
 ## Get latest from https://github.com/github/gitignore/blob/master/VisualStudio.gitignore
 
 # terraform
-terraform.tfstate
 devops/*/.terraform
 devops/*/.terraform.*
+devops/*/.terraform.tfstate.*
 
 # User-specific files
 *.rsuser

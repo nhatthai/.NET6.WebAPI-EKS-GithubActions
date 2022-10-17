@@ -11,7 +11,7 @@ Deploy a sample .Net6 WebAPI to Amazon EKS with Github Actions
 
 + Update kubeconfig
 ```
-aws eks update-kubeconfig --region ap-southeast-1 --name eks-github
+aws eks update-kubeconfig --region ap-southeast-1 --name webapi-eks
 ```
 
 + Create Role
@@ -23,7 +23,7 @@ aws iam attach-role-policy --policy-arn arn:aws:iam::aws:policy/AmazonEKSCluster
 
 + oidc-provider and cluster
 ```
-eksctl utils associate-iam-oidc-provider --region=ap-southeast-1 --cluster=eks-github --approve
+eksctl utils associate-iam-oidc-provider --region=ap-southeast-1 --cluster=webapi-eks --approve
 ```
 
 + Create policy
@@ -53,20 +53,20 @@ aws iam attach-role-policy --role-name AmazonEKSLoadBalancerControllerRole  --po
 
 + Create Service Account
 ```
-eksctl create iamserviceaccount --cluster=eks-github --namespace=kube-system --name=aws-load-balancer-controller --role-name AmazonEKSLoadBalancerControllerRole --attach-policy-arn=arn:aws:iam::ACCOUNT_ID:policy/ALBIngressControllerIAMPolicy --override-existing-serviceaccounts --approve
+eksctl create iamserviceaccount --cluster=webapi-eks --namespace=kube-system --name=aws-load-balancer-controller --role-name AmazonEKSLoadBalancerControllerRole --attach-policy-arn=arn:aws:iam::ACCOUNT_ID:policy/ALBIngressControllerIAMPolicy --override-existing-serviceaccounts --approve
 
 kubectl apply -f AWS/aws-load-balancer-controller-service-account.yml
 ```
 
 + Get IAM Service Account
 ```
-eksctl  get iamserviceaccount --cluster eks-github
+eksctl  get iamserviceaccount --cluster webapi-eks
 
 kubectl describe sa aws-load-balancer-controller -n kube-system
 
 kubectl apply -k "github.com/aws/eks-charts/stable/aws-load-balancer-controller/crds?ref=master"
 
-helm install aws-load-balancer-controller eks/aws-load-balancer-controller --set clusterName=eks-github --set serviceAccount.create=false --set serviceAccount.name=aws-load-balancer-controller -n kube-system
+helm install aws-load-balancer-controller eks/aws-load-balancer-controller --set clusterName=webapi-eks --set serviceAccount.create=false --set serviceAccount.name=aws-load-balancer-controller -n kube-system
 ```
 
 + Verify that the AWS Load Balancer Controller is installed:
@@ -78,43 +78,6 @@ kubectl get deployment -n kube-system aws-load-balancer-controller
 ```
 kubectl logs -n kube-system deployment.apps/aws-load-balancer-controller
 ```
-
-
-### Apply Terraform
-+ Create Infrastructure EKS
-    ```
-    cd devops\terraform
-    terraform init
-    terraform apply
-    ```
-
-+ Update kubeconfig
-    ```
-    aws eks update-kubeconfig --region ap-southeast-1 --name microservice-eks-00mIoI2W
-    ```
-
-+ Create Service Account
-    ```
-    eksctl create iamserviceaccount --cluster=microservice-eks-00mIoI2W --name=aws-load-balancer-controller --namespace=kube-system --role-name eksctl-eks-github-addon-iamserviceaccount-ku-Role1 --attach-policy-arn=arn:aws:iam::783560535431:policy/ALBIngressControllerIAMPolicy --override-existing-serviceaccounts --approve
-
-    kubectl apply -f aws/aws-load-balancer-controller-service-account.yml
-    ```
-
-+ Get IAM Service Account
-    ```
-    eksctl get iamserviceaccount --cluster microservice-eks-00mIoI2W
-
-    kubectl describe sa aws-load-balancer-controller -n kube-system
-
-    kubectl apply -k "github.com/aws/eks-charts/stable/aws-load-balancer-controller/crds?ref=master"
-
-    helm install aws-load-balancer-controller eks/aws-load-balancer-controller --set clusterName=microservice-eks-00mIoI2W --set serviceAccount.create=false --set serviceAccount.name=aws-load-balancer-controller -n kube-system
-    ```
-
-+ Verify the AWS Load Balancer Controller
-    ```
-    kubectl get deployment -n kube-system aws-load-balancer-controller
-    ```
 
 ### Issues
 + Couldn't create an AWS Load Balancer Controller
