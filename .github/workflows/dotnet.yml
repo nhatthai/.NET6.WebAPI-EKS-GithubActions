@@ -80,5 +80,6 @@ jobs:
 
     # Set image tag into webapi.yml and
     - run: |
+        export IMAGE_TAG=${{ github.sha }}
         envsubst < devops/k8s/webapi.tpl.yml > webapi.yml
         kubectl apply -f webapi.yml
