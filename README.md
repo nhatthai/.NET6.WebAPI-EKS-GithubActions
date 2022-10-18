@@ -55,7 +55,7 @@ aws iam attach-role-policy --role-name AmazonEKSLoadBalancerControllerRole  --po
 ```
 eksctl create iamserviceaccount --cluster=webapi-eks --namespace=kube-system --name=aws-load-balancer-controller --role-name AmazonEKSLoadBalancerControllerRole --attach-policy-arn=arn:aws:iam::ACCOUNT_ID:policy/ALBIngressControllerIAMPolicy --override-existing-serviceaccounts --approve
 
-kubectl apply -f AWS/aws-load-balancer-controller-service-account.yml
+kubectl apply -f terraform/aws-load-balancer-controller-service-account.yml
 ```
 
 + Get IAM Service Account
@@ -77,6 +77,61 @@ kubectl get deployment -n kube-system aws-load-balancer-controller
 + Get log AWS Load Balancer Controller
 ```
 kubectl logs -n kube-system deployment.apps/aws-load-balancer-controller
+```
+
++ Deploy Ingress EKS
+```
+kubectl apply -f k8s/ingress-eks.yml
+```
+
++ Check Ingress
+```
+kubectl describe ingress ingress-webapi
+```
+
+### Using Terraform
++ Init Infrastructure
+```
+terraform init
+terraform apply
+```
+
++ Create Service Account
+```
+eksctl create iamserviceaccount --cluster=webapi-eks --namespace=kube-system --name=aws-load-balancer-controller --role-name webapi-eks_eks_lb --attach-policy-arn=arn:aws:iam::783560535431:policy/AmazonEKS_AWS_Load_Balancer_Controller-20221018041745738200000001 --override-existing-serviceaccounts --approve
+
+kubectl apply -f terraform/aws-load-balancer-controller-service-account.yml
+```
+
++ Get IAM Service Account
+```
+eksctl  get iamserviceaccount --cluster webapi-eks
+
+kubectl describe sa aws-load-balancer-controller -n kube-system
+
+kubectl apply -k "github.com/aws/eks-charts/stable/aws-load-balancer-controller/crds?ref=master"
+
+helm install aws-load-balancer-controller eks/aws-load-balancer-controller --set clusterName=webapi-eks --set serviceAccount.create=false --set serviceAccount.name=aws-load-balancer-controller -n kube-system
+```
+
++ Verify that the AWS Load Balancer Controller is installed:
+```
+kubectl get deployment -n kube-system aws-load-balancer-controller
+```
+
++ Get log AWS Load Balancer Controller
+```
+kubectl logs -n kube-system deployment.apps/aws-load-balancer-controller
+```
+
++ Deploy Ingress EKS
+```
+kubectl apply -f k8s/ingress-eks.yml
+```
+
++ Check Ingress
+```
+kubectl describe ingress ingress-webapi
 ```
 
 ### Issues
