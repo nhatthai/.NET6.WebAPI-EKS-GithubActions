@@ -1,8 +1,8 @@
-resource "helm_release" "aws_load_balancer_controller" {
-  name       = "aws-load-balancer-controller"
+resource "helm_release" "alb" {
   repository = "https://aws.github.io/eks-charts"
   chart      = "aws-load-balancer-controller"
-  namespace  = "kube-system"
+  name  	= local.name
+  namespace = local.namespace
 
   set {
     name  = "region"
@@ -26,12 +26,63 @@ resource "helm_release" "aws_load_balancer_controller" {
 
   set {
     name  = "serviceAccount.name"
-    value = "aws-load-balancer-controller"
+    value = kubernetes_service_account.alb_service_account.metadata[0].name
   }
 
   set {
     name  = "clusterName"
     value = local.cluster_name
   }
+}
 
+
+resource "kubernetes_service_account" "alb_service_account" {
+  metadata {
+	name  	= local.name
+	namespace   = local.namespace
+
+	labels = {
+    "app.kubernetes.io/component" = "controller"
+    "app.kubernetes.io/name"  	= local.name
+	}
+
+	annotations = {
+  	"eks.amazonaws.com/role-arn" = "arn:aws:iam::${local.account_id}:role/${aws_iam_role.alb_iam_role.name}"
+	}
+  }
+}
+
+resource "aws_iam_policy" "alb_policy" {
+  name        = "${local.cluster_name}-alb"
+  path        = "/"
+  description = "Policy for the AWS Load Balancer Controller that allows it to make calls to AWS APIs."
+  policy = file("iam-policy.json")
+}
+
+resource "aws_iam_role" "alb_iam_role" {
+  name = "${local.cluster_name}-alb"
+
+  assume_role_policy = jsonencode({
+	Version = "2012-10-17"
+	Statement = [
+        {
+            Effect = "Allow"
+            Principal = {
+              Federated = "arn:aws:iam::${local.account_id}:oidc-provider/${module.eks.oidc_provider_arn}"
+            }
+            Action = "sts:AssumeRoleWithWebIdentity"
+            Condition = {
+                StringEquals = {
+                  "${module.eks.oidc_provider_arn}:aud" = "sts.amazonaws.com"
+                  "${module.eks.oidc_provider_arn}:sub" = "system:serviceaccount:${local.namespace}:${local.name}"
+                }
+            }
+        }
+	]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "policy_attachment" {
+  role   	= aws_iam_role.alb_iam_role.name
+  policy_arn = aws_iam_policy.alb_policy.arn
 }
