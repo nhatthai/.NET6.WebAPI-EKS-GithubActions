@@ -55,7 +55,7 @@ aws iam attach-role-policy --role-name AmazonEKSLoadBalancerControllerRole  --po
 ```
 eksctl create iamserviceaccount --cluster=webapi-eks --namespace=kube-system --name=aws-load-balancer-controller --role-name AmazonEKSLoadBalancerControllerRole --attach-policy-arn=arn:aws:iam::ACCOUNT_ID:policy/ALBIngressControllerIAMPolicy --override-existing-serviceaccounts --approve
 
-kubectl apply -f AWS/aws-load-balancer-controller-service-account.yml
+kubectl apply -f terraform/aws-load-balancer-controller-service-account.yml
 ```
 
 + Get IAM Service Account
@@ -79,6 +79,73 @@ kubectl get deployment -n kube-system aws-load-balancer-controller
 kubectl logs -n kube-system deployment.apps/aws-load-balancer-controller
 ```
 
++ Deploy Ingress EKS
+```
+kubectl apply -f k8s/ingress-eks.yml
+```
+
++ Check Ingress
+```
+kubectl describe ingress ingress-webapi
+```
+
+### Using Terraform
++ Init Infrastructure
+```
+terraform init
+terraform apply
+```
+
++ Create Service Account
+```
+eksctl create iamserviceaccount --cluster=webapi-eks --namespace=kube-system --name=aws-load-balancer-controller --role-name webapi-eks_eks_lb --attach-policy-arn=arn:aws:iam::783560535431:policy/AmazonEKS_AWS_Load_Balancer_Controller-20221024032554932500000001 --override-existing-serviceaccounts --approve
+
+kubectl apply -f terraform/aws-load-balancer-controller-service-account.yml
+```
+
+
++ Get IAM Service Account
+```
+eksctl  get iamserviceaccount --cluster webapi-eks
+
+kubectl describe sa aws-load-balancer-controller -n kube-system
+
+kubectl apply -k "github.com/aws/eks-charts/stable/aws-load-balancer-controller/crds?ref=master"
+
+helm install aws-load-balancer-controller eks/aws-load-balancer-controller --set clusterName=webapi-eks --set serviceAccount.create=false --set serviceAccount.name=aws-load-balancer-controller -n kube-system
+```
+
++ Verify that the AWS Load Balancer Controller is installed:
+```
+kubectl get deployment -n kube-system aws-load-balancer-controller
+```
+
++ Get log AWS Load Balancer Controller
+```
+kubectl logs -n kube-system deployment.apps/aws-load-balancer-controller
+```
+
++ Verify that your service account is associated with the AWS Load Balancer Controller
+```
+kubectl get deploy aws-load-balancer-controller -n kube-system -o yaml
+```
+
++ See what IAM role is attached to the service account associated with the AWS Load Balancer Controller:
+```
+kubectl describe sa aws-load-balancer-controller -n kube-system
+```
+
+
++ Deploy Ingress EKS
+```
+kubectl apply -f k8s/ingress-eks.yml
+```
+
++ Check Ingress
+```
+kubectl describe ingress ingress-webapi
+```
+
 ### Issues
 + Couldn't create an AWS Load Balancer Controller
 ```
@@ -91,9 +158,19 @@ Add permission iam_policy_v1_to_v2_additional.json
 Because set Path_Base in code with .NET6(Not set Path_Base variable)
 ```
 
++ The ALB couldn't call the service in EKS
+```
+Add Security Group and public subnets for ingress
+```
 
 ### Result
 + ![Web API](./images/mapping-webapi.png)
+
++ ![ALB Ingress](./images/alb.png)
+
++ ![Web API](./images/webapi.png)
+
++ ![Hello App](./images/helloapp.png)
 
 ### Reference
 + [An ALB Ingress in Amazon EKS](https://aws.amazon.com/premiumsupport/knowledge-center/eks-alb-ingress-aws-waf/)

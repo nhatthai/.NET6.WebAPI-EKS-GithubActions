@@ -9,13 +9,22 @@ metadata:
     kubernetes.io/ingress.class: alb
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
-    # your subnets of instance
-    alb.ingress.kubernetes.io/subnets: subnet-0ff92518b5e78e22c, subnet-024519f41bfc115c3, subnet-057337a37f7dd51b4
+    # your subnets of instance, public subnets
+    alb.ingress.kubernetes.io/subnets: 'subnet-0ab0cda7c2ae7d11c, subnet-00cfca49cd9dddf44, subnet-0fb1bf9a089cdc28d'
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
+    alb.ingress.kubernetes.io/security-groups: 'sg-04d561bfb74b29aeb, sg-016f24903b4c4b6de'
 spec:
   rules:
   - http:
       paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: helloapp-service
+            port:
+              number: 80
+
       - path: /webapi
         pathType: Prefix
         backend:
