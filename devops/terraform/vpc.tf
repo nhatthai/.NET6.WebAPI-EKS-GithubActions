@@ -2,7 +2,7 @@ module "vpc" {
   source  = "terraform-aws-modules/vpc/aws"
   version = "3.14.2"
 
-  name = "microservice-vpc"
+  name = "eks-vpc"
 
   cidr = "10.0.0.0/16"
   azs  = slice(data.aws_availability_zones.available.names, 0, 3)
@@ -22,5 +22,24 @@ module "vpc" {
   private_subnet_tags = {
     "kubernetes.io/cluster/${local.cluster_name}" = "shared"
     "kubernetes.io/role/internal-elb"             = 1
+  }
+}
+
+# create security group to be used later by the ingress ALB
+resource "aws_security_group" "alb" {
+  name   = "eks-alb"
+  vpc_id = module.vpc.vpc_id
+
+  ingress {
+    description      = "http"
+    from_port        = 80
+    to_port          = 80
+    protocol         = "tcp"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+
+  tags = {
+    "Name" = "eks-alb"
   }
 }
