@@ -98,10 +98,11 @@ terraform apply
 
 + Create Service Account
 ```
-eksctl create iamserviceaccount --cluster=webapi-eks --namespace=kube-system --name=aws-load-balancer-controller --role-name webapi-eks_eks_lb --attach-policy-arn=arn:aws:iam::783560535431:policy/AmazonEKS_AWS_Load_Balancer_Controller-20221018041745738200000001 --override-existing-serviceaccounts --approve
+eksctl create iamserviceaccount --cluster=webapi-eks --namespace=kube-system --name=aws-load-balancer-controller --role-name webapi-eks_eks_lb --attach-policy-arn=arn:aws:iam::783560535431:policy/AmazonEKS_AWS_Load_Balancer_Controller-20221024032554932500000001 --override-existing-serviceaccounts --approve
 
 kubectl apply -f terraform/aws-load-balancer-controller-service-account.yml
 ```
+
 
 + Get IAM Service Account
 ```
@@ -123,6 +124,17 @@ kubectl get deployment -n kube-system aws-load-balancer-controller
 ```
 kubectl logs -n kube-system deployment.apps/aws-load-balancer-controller
 ```
+
++ Verify that your service account is associated with the AWS Load Balancer Controller
+```
+kubectl get deploy aws-load-balancer-controller -n kube-system -o yaml
+```
+
++ See what IAM role is attached to the service account associated with the AWS Load Balancer Controller:
+```
+kubectl describe sa aws-load-balancer-controller -n kube-system
+```
+
 
 + Deploy Ingress EKS
 ```
@@ -146,9 +158,19 @@ Add permission iam_policy_v1_to_v2_additional.json
 Because set Path_Base in code with .NET6(Not set Path_Base variable)
 ```
 
++ The ALB couldn't call the service in EKS
+```
+Add Security Group and public subnets for ingress
+```
 
 ### Result
 + ![Web API](./images/mapping-webapi.png)
+
++ ![ALB Ingress](./images/alb.png)
+
++ ![Web API](./images/webapi.png)
+
++ ![Hello App](./images/helloapp.png)
 
 ### Reference
 + [An ALB Ingress in Amazon EKS](https://aws.amazon.com/premiumsupport/knowledge-center/eks-alb-ingress-aws-waf/)
