@@ -36,31 +36,16 @@ resource "helm_release" "alb" {
 }
 
 
-resource "kubernetes_service_account" "alb_service_account" {
-  metadata {
-	name  	= local.name
-	namespace   = local.namespace
-
-	labels = {
-    "app.kubernetes.io/component" = "controller"
-    "app.kubernetes.io/name"  	= local.name
-	}
-
-	annotations = {
-  	"eks.amazonaws.com/role-arn" = "arn:aws:iam::${local.account_id}:role/${aws_iam_role.alb_iam_role.name}"
-	}
-  }
-}
-
 resource "aws_iam_policy" "alb_policy" {
-  name        = "${local.cluster_name}-alb"
+  name        = "${local.cluster_name}-alb-policy"
   path        = "/"
   description = "Policy for the AWS Load Balancer Controller that allows it to make calls to AWS APIs."
   policy = file("iam-policy.json")
 }
 
+
 resource "aws_iam_role" "alb_iam_role" {
-  name = "${local.cluster_name}-alb"
+  name = "${local.cluster_name}-alb-role"
 
   assume_role_policy = jsonencode({
 	Version = "2012-10-17"
@@ -68,7 +53,7 @@ resource "aws_iam_role" "alb_iam_role" {
         {
             Effect = "Allow"
             Principal = {
-              Federated = "arn:aws:iam::${local.account_id}:oidc-provider/${module.eks.oidc_provider_arn}"
+              Federated = "${module.eks.oidc_provider_arn}"
             }
             Action = "sts:AssumeRoleWithWebIdentity"
             Condition = {
@@ -85,4 +70,23 @@ resource "aws_iam_role" "alb_iam_role" {
 resource "aws_iam_role_policy_attachment" "policy_attachment" {
   role   	= aws_iam_role.alb_iam_role.name
   policy_arn = aws_iam_policy.alb_policy.arn
+}
+
+# Deploy Ingress Controller(Load Balancer Controller)
+# name      = "aws-load-balancer-controller"
+# namespace = "kube-system"
+resource "kubernetes_service_account" "alb_service_account" {
+  metadata {
+	name  	= local.name
+	namespace   = local.namespace
+
+	labels = {
+    "app.kubernetes.io/component" = "controller"
+    "app.kubernetes.io/name"  	= local.name
+	}
+
+	annotations = {
+  	"eks.amazonaws.com/role-arn" = "arn:aws:iam::${local.account_id}:role/${aws_iam_role.alb_iam_role.name}"
+	}
+  }
 }

@@ -6,10 +6,7 @@ module "eks" {
   cluster_version = "1.22"
   cluster_endpoint_private_access = true
   cluster_endpoint_public_access  = true
-  cluster_additional_security_group_ids = [aws_security_group.node_group_one.id]
-
-  cluster_endpoint_private_access = true
-  cluster_endpoint_public_access  = true
+  # cluster_additional_security_group_ids = [aws_security_group.node_group_one.id, aws_security_group.node_group_two.id]
 
   vpc_id     = module.vpc.vpc_id
   subnet_ids = module.vpc.private_subnets
@@ -22,7 +19,7 @@ module "eks" {
     # Disabling and using externally provided security groups
     create_security_group = false
 
-    vpc_security_group_ids = [aws_security_group.node_group_one.id]
+    # vpc_security_group_ids = [aws_security_group.node_group_one.id, aws_security_group.node_group_two.id]
   }
 
   node_security_group_additional_rules = {
@@ -66,6 +63,20 @@ module "eks" {
 
       vpc_security_group_ids = [
         aws_security_group.node_group_one.id
+      ]
+    }
+    two = {
+      name = "node-group-2"
+
+      instance_types = ["t3.small"]
+      capacity_type  = "ON_DEMAND"
+
+      min_size     = 1
+      max_size     = 2
+      desired_size = 1
+
+      vpc_security_group_ids = [
+        aws_security_group.node_group_two.id
       ]
     }
   }
