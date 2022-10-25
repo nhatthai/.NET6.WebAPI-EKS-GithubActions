@@ -14,8 +14,6 @@ data "aws_availability_zones" "available" {}
 locals {
   cluster_name = "webapi-eks"
   account_id = "783560535431"
-  namespace = "kube-system"
-  name = "aws-load-balancer-controller"
 }
 
 provider "helm" {

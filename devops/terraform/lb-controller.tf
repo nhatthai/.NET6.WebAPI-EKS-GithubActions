@@ -1,8 +1,8 @@
 resource "helm_release" "alb" {
   repository = "https://aws.github.io/eks-charts"
   chart      = "aws-load-balancer-controller"
-  name  	= local.name
-  namespace = local.namespace
+  name  	=  "aws-load-balancer-controller"
+  namespace = "kube-system"
 
   set {
     name  = "region"
@@ -59,7 +59,7 @@ resource "aws_iam_role" "alb_iam_role" {
             Condition = {
                 StringEquals = {
                   "${module.eks.oidc_provider_arn}:aud" = "sts.amazonaws.com"
-                  "${module.eks.oidc_provider_arn}:sub" = "system:serviceaccount:${local.namespace}:${local.name}"
+                  "${replace(module.eks.arn, "https://", "")}:sub" = "system:serviceaccount:kube-system:aws-load-balancer-controller
                 }
             }
         }
@@ -77,12 +77,12 @@ resource "aws_iam_role_policy_attachment" "policy_attachment" {
 # namespace = "kube-system"
 resource "kubernetes_service_account" "alb_service_account" {
   metadata {
-	name  	= local.name
-	namespace   = local.namespace
+	name  	=  "aws-load-balancer-controller"
+	namespace   = "kube-system"
 
 	labels = {
     "app.kubernetes.io/component" = "controller"
-    "app.kubernetes.io/name"  	= local.name
+    "app.kubernetes.io/name"  	=  "aws-load-balancer-controller"
 	}
 
 	annotations = {
