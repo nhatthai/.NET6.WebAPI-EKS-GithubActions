@@ -1,5 +1,7 @@
 # .NET6.WebAPI to EKS using GithubActions
-Deploy a sample .Net6 WebAPI to Amazon EKS with Github Actions
+Deploy a sample .NET6 WebAPI to Amazon EKS with Github Actions
+    + Create Infrastructure as code using Terraform
+    + Application Load Balancer in EKS
 
 ### Github Runner Requirements
 + Install Docker & DockerCompose
@@ -95,11 +97,16 @@ kubectl describe ingress ingress-webapi
 terraform init
 terraform apply
 ```
-Terraform will create a role name with aws-load-balancer-controller name
-    _ It creates a service account(aws-load-balancer-controller)
-    - It sets permission
-    - It sets Trust relationships(aws/load-balancer-role-trust-policy)
+
++ Terraform will create a role name with aws-load-balancer-controller name
+    + It creates a service account(aws-load-balancer-controller)
+    + It sets permission
+    + It sets Trust relationships(aws/load-balancer-role-trust-policy)
+
+
 + ![Role](./images/role.png)
+
+
 + ![Trust Relationships](./images/trust-relationships.png)
 
 The same command lines below:
@@ -172,3 +179,6 @@ Add Security Group and public subnets for ingress
 ### Reference
 + [An ALB Ingress in Amazon EKS](https://aws.amazon.com/premiumsupport/knowledge-center/eks-alb-ingress-aws-waf/)
 + [AWS Load Balancer Controller](https://docs.aws.amazon.com/eks/latest/userguide/aws-load-balancer-controller.html)
++ [create EKS Cluster using Terraform](https://antonputra.com/amazon/create-eks-cluster-using-terraform-modules/#deploy-cluster-autoscaler)
++ [Setting up EKS with Terraform, Helm and a Load balancer](https://andrewtarry.com/posts/terraform-eks-alb-setup/)
++ [Terraform EKS](https://learnk8s.io/terraform-eks)

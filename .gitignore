@@ -7,6 +7,9 @@
 devops/*/.terraform
 devops/*/.terraform.*
 devops/*/.terraform.tfstate.*
+terraform.tfstate
+devops/*/terraform.tfstate
+devops/*/terraform.tfstate.*
 
 # User-specific files
 *.rsuser
