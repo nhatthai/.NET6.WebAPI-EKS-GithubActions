@@ -1,3 +1,22 @@
+# Create IAM role for service accounts (IRSA) for use within EKS clusters
+module "lb_irsa_role" {
+  source    = "terraform-aws-modules/iam/aws//modules/iam-role-for-service-accounts-eks"
+
+  role_name = "aws-load-balancer-controller"
+  attach_load_balancer_controller_policy = true
+
+  oidc_providers = {
+    main = {
+      provider_arn               = module.eks.oidc_provider_arn
+      namespace_service_accounts = ["kube-system:aws-load-balancer-controller"]
+    }
+  }
+
+  tags = {
+    Name = "vpc-eks-lb-irsa"
+  }
+}
+
 resource "helm_release" "alb" {
   repository = "https://aws.github.io/eks-charts"
   chart      = "aws-load-balancer-controller"
@@ -26,67 +45,11 @@ resource "helm_release" "alb" {
 
   set {
     name  = "serviceAccount.name"
-    value = kubernetes_service_account.alb_service_account.metadata[0].name
+    value = "aws-load-balancer-controller"
   }
 
   set {
     name  = "clusterName"
     value = local.cluster_name
-  }
-}
-
-
-resource "aws_iam_policy" "alb_policy" {
-  name        = "${local.cluster_name}-alb-policy"
-  path        = "/"
-  description = "Policy for the AWS Load Balancer Controller that allows it to make calls to AWS APIs."
-  policy = file("iam-policy.json")
-}
-
-
-resource "aws_iam_role" "alb_iam_role" {
-  name = "${local.cluster_name}-alb-role"
-
-  assume_role_policy = jsonencode({
-	Version = "2012-10-17"
-	Statement = [
-        {
-            Effect = "Allow"
-            Principal = {
-              Federated = "${module.eks.oidc_provider_arn}"
-            }
-            Action = "sts:AssumeRoleWithWebIdentity"
-            Condition = {
-                StringEquals = {
-                  "${module.eks.oidc_provider_arn}:aud" = "sts.amazonaws.com"
-                  "${replace(module.eks.arn, "https://", "")}:sub" = "system:serviceaccount:kube-system:aws-load-balancer-controller
-                }
-            }
-        }
-	]
-  })
-}
-
-resource "aws_iam_role_policy_attachment" "policy_attachment" {
-  role   	= aws_iam_role.alb_iam_role.name
-  policy_arn = aws_iam_policy.alb_policy.arn
-}
-
-# Deploy Ingress Controller(Load Balancer Controller)
-# name      = "aws-load-balancer-controller"
-# namespace = "kube-system"
-resource "kubernetes_service_account" "alb_service_account" {
-  metadata {
-	name  	=  "aws-load-balancer-controller"
-	namespace   = "kube-system"
-
-	labels = {
-    "app.kubernetes.io/component" = "controller"
-    "app.kubernetes.io/name"  	=  "aws-load-balancer-controller"
-	}
-
-	annotations = {
-  	"eks.amazonaws.com/role-arn" = "arn:aws:iam::${local.account_id}:role/${aws_iam_role.alb_iam_role.name}"
-	}
   }
 }
