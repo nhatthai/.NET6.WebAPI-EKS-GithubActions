@@ -9,8 +9,8 @@ metadata:
     kubernetes.io/ingress.class: alb
     alb.ingress.kubernetes.io/scheme: internet-facing
     alb.ingress.kubernetes.io/target-type: ip
-    # your subnets of instance, public subnets
-    alb.ingress.kubernetes.io/subnets: 'subnet-00dd930ce53c8f46f, subnet-077ce0eb281b104bd, subnet-04a9613455ab9e1ca'
+    # your subnets of instance, public subnets of EKS
+    alb.ingress.kubernetes.io/subnets: 'subnet-08f0e17fd92dea229, subnet-0af6932d947246cdf, subnet-0e946fe2a5dcc8594'
     alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}]'
     alb.ingress.kubernetes.io/security-groups: 'eks-alb'
 spec:
