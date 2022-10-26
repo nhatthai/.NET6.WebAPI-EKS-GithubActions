@@ -95,14 +95,21 @@ kubectl describe ingress ingress-webapi
 terraform init
 terraform apply
 ```
+Terraform will create a role name with aws-load-balancer-controller name
+    _ It creates a service account(aws-load-balancer-controller)
+    - It sets permission
+    - It sets Trust relationships(aws/load-balancer-role-trust-policy)
++ ![Role](./images/role.png)
++ ![Trust Relationships](./images/trust-relationships.png)
+
+The same command lines below:
 
 + Create Service Account
 ```
-eksctl create iamserviceaccount --cluster=webapi-eks --namespace=kube-system --name=aws-load-balancer-controller --role-name webapi-eks_eks_lb --attach-policy-arn=arn:aws:iam::783560535431:policy/AmazonEKS_AWS_Load_Balancer_Controller-20221024032554932500000001 --override-existing-serviceaccounts --approve
+eksctl create iamserviceaccount --cluster=webapi-eks --namespace=kube-system --name=aws-load-balancer-controller --role-name webapi-eks-lb-role-for-service-account --attach-policy-arn=arn:aws:iam::783560535431:policy/AmazonEKS_AWS_Load_Balancer_Controller-20221026035125522600000001 --override-existing-serviceaccounts --approve
 
 kubectl apply -f terraform/aws-load-balancer-controller-service-account.yml
 ```
-
 
 + Get IAM Service Account
 ```
@@ -135,16 +142,6 @@ kubectl get deploy aws-load-balancer-controller -n kube-system -o yaml
 kubectl describe sa aws-load-balancer-controller -n kube-system
 ```
 
-
-+ Deploy Ingress EKS
-```
-kubectl apply -f k8s/ingress-eks.yml
-```
-
-+ Check Ingress
-```
-kubectl describe ingress ingress-webapi
-```
 
 ### Issues
 + Couldn't create an AWS Load Balancer Controller
