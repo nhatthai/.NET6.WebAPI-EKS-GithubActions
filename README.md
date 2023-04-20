@@ -1,5 +1,5 @@
-# .NET6.WebAPI to EKS using GithubActions
-    Deploy a sample .NET6 WebAPI to Amazon EKS with Github Actions
+# .NET6 WebAPI to EKS using GitHub Actions
+    Deploy a sample .NET6 WebAPI to Amazon EKS with GitHub Actions
     + Create Infrastructure as code using Terraform
     + Application Load Balancer in EKS
 
